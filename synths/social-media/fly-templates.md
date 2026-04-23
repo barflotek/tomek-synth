@@ -82,11 +82,51 @@ Returns: RenderedAsset
 
 **Key behavior:** The URL it returns is already rewritten from `fly.dev/a/*.jpg` → `bellink.io/zboralscy/img/*.jpg`. Never reconstruct the URL yourself. Never substitute the Fly origin. See § 4 for why.
 
-### 2.3 `zboralscy_compose_reel` — NOT YET SHIPPED
+### 2.3 `zboralscy_compose_reel`
 
-Backlog item. Will compose intro (T3A/C) + user video + outro (T6) into an MP4 via ffmpeg on Fly. Server-side endpoint `POST /compose/:id` already exists in `server.js`; MCP tool wrapper still to build (~2-3h). Until it ships, reels are delivered as **still frame renders** (T3A or T3C hook image + T6 outro image) that Tomek or his editor composes externally.
+Composes a finished MP4 reel server-side: prepends intro frame (default T3C drone story) → pins user-supplied video clip in middle → appends T6 agent outro. Returns a **Bellink-proxied MP4 URL** safe to pass to Meta publishing tools. ffmpeg pipeline runs on Fly.
 
-Track in `~/ops-vault/businesses/tomek/backlog.md` → "Zboralscy render connector follow-ups".
+```
+Parameters:
+  source:    object   (required)
+    url:       string   (required)   public http(s) URL to source video
+    start:     number   (optional)   seconds to skip at start (default 0)
+    duration:  number   (optional)   seconds to use (default 10, capped at 30)
+  data:      object   (optional)   template fields piped into intro+outro frames
+                                    T3C uses: location, title, area, price, cta
+                                    T6 uses: agentName, agentRole, phone, email, www, portrait
+  intro:     string   (optional)   intro template ID (must be 9:16). Default "T3C"
+  outro:     string   (optional)   outro template ID (must be 9:16). Default "T6"
+  introSec:  number   (optional)   intro display seconds. Default 1.5
+  outroSec:  number   (optional)   outro display seconds. Default 2.0
+  jobLabel:  string   (optional)   filename prefix (alphanumeric). Default "REEL"
+
+Returns: ComposedReel
+  {
+    id:           string,   // jobLabel uppercased
+    url:          string,   // ALREADY proxied: https://www.bellink.io/zboralscy/img/<hash>.mp4
+    width:        1080,
+    height:       1920,
+    durationSec:  number,   // total composed length (intro + source + outro)
+    bytes:        number,
+    intro:        string,   // intro template ID used
+    outro:        string    // outro template ID used
+  }
+```
+
+**Source URL types:**
+- **Direct media** (`.mp4`, `.mov`, `.m4v`, `.webm`, `.mkv`): fetched via `curl`. Fastest path. Tomek can drop a Drive/Dropbox/WeTransfer "direct download" link.
+- **Streaming hosts** (YouTube, Vimeo, Drive `view` links, etc.): fetched via `yt-dlp` with `--download-sections` (lazy fetch — only the requested `start..start+duration` window).
+
+**Same proxy rule as render_post:** the `url` returned is already `bellink.io/zboralscy/img/<hash>.mp4`. Trust it. Don't reconstruct from Fly. The proxy route at `app/zboralscy/img/[filename]/route.ts` handles `.mp4` the same way it handles `.jpg`.
+
+**Latency:** 30-90s typical (yt-dlp fetch + ffmpeg normalise + render frames + concat). Acceptable as a sync MCP call. Set Tomek's expectation: "renderowanie reela trwa około minuty."
+
+**Failure modes:**
+- Source URL unreachable → 500 from upstream with `curl`/`yt-dlp` stderr in error message
+- Source > 30s requested → automatically clamped to 30s
+- intro/outro is not 9:16 → 400 "intro X is not 1080x1920; use T3A/T3B/T3C/T6"
+- ffmpeg crash → 500 with last 800 chars of stderr
 
 ---
 
