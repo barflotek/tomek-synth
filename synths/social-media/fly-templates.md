@@ -10,7 +10,7 @@ Everything about the Zboralscy render service (`zboralscy-templates.fly.dev`) an
 claude.ai (Tomek)
      │  MCP
      ▼
-Bellink (~/mcp-multitenant-hub, deployed to Vercel as www.bellink.io)
+Bellink (~/mcp-multitenant-hub, deployed to Vercel as app.bellink.io)
      │  ├─ zboralscy_list_templates  → reads template schema
      │  ├─ zboralscy_render_post     → POSTs to Fly, rewrites URL
      │  └─ /zboralscy/img/[filename] → proxy route for Meta publishing
@@ -22,7 +22,7 @@ Fly.io (zboralscy-templates.fly.dev)
      │  └─ stored PNGs/JPEGs at /a/<hash>.jpg
      │
      ▼
-Returned URL:  https://www.bellink.io/zboralscy/img/<hash>.jpg
+Returned URL:  https://app.bellink.io/zboralscy/img/<hash>.jpg
      │
      ▼
 meta_create_instagram_post  /  meta_create_page_photo
@@ -73,7 +73,7 @@ Parameters:
 Returns: RenderedAsset
   {
     id:     string,   // template ID
-    url:    string,   // ALREADY proxied: https://www.bellink.io/zboralscy/img/<hash>.jpg
+    url:    string,   // ALREADY proxied: https://app.bellink.io/zboralscy/img/<hash>.jpg
     width:  number,
     height: number,
     bytes:  number
@@ -104,7 +104,7 @@ Parameters:
 Returns: ComposedReel
   {
     id:           string,   // jobLabel uppercased
-    url:          string,   // ALREADY proxied: https://www.bellink.io/zboralscy/img/<hash>.mp4
+    url:          string,   // ALREADY proxied: https://app.bellink.io/zboralscy/img/<hash>.mp4
     width:        1080,
     height:       1920,
     durationSec:  number,   // total composed length (intro + source + outro)
@@ -391,9 +391,9 @@ Photo-heavy room tour slide — the body slides between T1 (cover) and T4C (clos
 
 ## 4. The Bellink-proxy rule (critical)
 
-**Short version:** The URL returned by `zboralscy_render_post` is already `https://www.bellink.io/zboralscy/img/<hash>.jpg`. Hand it directly to `meta_create_instagram_post` or `meta_create_page_photo`. Don't modify it.
+**Short version:** The URL returned by `zboralscy_render_post` is already `https://app.bellink.io/zboralscy/img/<hash>.jpg`. Hand it directly to `meta_create_instagram_post` or `meta_create_page_photo`. Don't modify it.
 
-**Why it matters:** On 2026-04-22 we burned an afternoon debugging Meta error 9004 ("Only photo or video can be accepted as media type") when passing `fly.dev` URLs. Root cause: Meta runs an undocumented **host-reputation check**. `fly.dev` / `render.com` / `railway.app` etc. get rejected even with valid JPEGs + correct Content-Type. Vercel-hosted origins pass. Fix: every Fly-generated asset is proxied through `https://www.bellink.io/zboralscy/img/[filename]` before any URL escapes to Meta.
+**Why it matters:** On 2026-04-22 we burned an afternoon debugging Meta error 9004 ("Only photo or video can be accepted as media type") when passing `fly.dev` URLs. Root cause: Meta runs an undocumented **host-reputation check**. `fly.dev` / `render.com` / `railway.app` etc. get rejected even with valid JPEGs + correct Content-Type. Vercel-hosted origins pass. Fix: every Fly-generated asset is proxied through `https://app.bellink.io/zboralscy/img/[filename]` before any URL escapes to Meta.
 
 **What the synth needs to remember:**
 
