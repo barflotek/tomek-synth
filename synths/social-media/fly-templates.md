@@ -136,7 +136,7 @@ Nine templates. All 1080px wide. Feed posts are **4:5 portrait (1080×1350)** so
 
 | ID   | Purpose                                        | Ratio | Use when                                                  |
 |------|------------------------------------------------|-------|-----------------------------------------------------------|
-| T1   | Listing hero                                   | 4:5   | New offer → IG feed + FB page                             |
+| T1   | Listing hero (standard + luxury tiers)         | 4:5   | New offer → IG feed + FB page                             |
 | T2   | Sprzedane (sold)                               | 4:5   | Deal closed, announcement within 48h                      |
 | T3A  | Reel cover — hook (list-style: "3 rzeczy…")    | 9:16  | Educational / top-of-funnel reel                          |
 | T3B  | Reel cover — question                          | 9:16  | "Pytanie tygodnia" / Q&A reel                             |
@@ -145,33 +145,77 @@ Nine templates. All 1080px wide. Feed posts are **4:5 portrait (1080×1350)** so
 | T4C  | Carousel summary / CTA card                    | 4:5   | Last slide of a carousel (drives to action)               |
 | T5   | Monthly market update                          | 4:5   | Monday of first week of month — raport rynkowy            |
 | T6   | Agent outro (end card for reels)               | 9:16  | ALWAYS the last frame of any reel (closes with Tomek's contact) |
+| T7   | Open Day (Dzień Otwarty) — standard + luxury   | 4:5   | Announce an open house event                              |
+| T8   | Carousel interior slide (photo-heavy room tour)| 4:5   | Between T1 cover + T4C closer — room-by-room photos       |
+
+### Tier system (T1, T7, T8)
+
+Three templates accept a `tier` field: `"standard"` (default) or `"luxury"`. The synth picks the tier based on property price + language:
+- **Standard** → functional info-dense layout, photo-dominant, feat-strip with icons, agent badge, bold sans typography. Use for listings ≲ 1M zł or any regular-market property.
+- **Luxury** → editorial, restrained, italic display serif headlines, solid-navy backgrounds (on T7), oversized decorative sygnet. Use for premium properties (≳ 1M zł), architecturally distinct, or when the listing description reads "luksusowy / apartament / rezydencja / willa".
+
+When in doubt, ask Tomek: "standard czy luxury?" Don't guess on borderline cases.
 
 ### 3.1 T1 — Listing Hero (1080×1350, 4:5)
 
-| Field      | Type   | Default                      | Notes                                  |
-|------------|--------|------------------------------|----------------------------------------|
-| `badge`    | string | "Nowa oferta"                | Gold chip top-left                     |
-| `location` | string | "Białystok · Pałacowa"       | Format: "Miasto · Dzielnica"           |
-| `price`    | string | "749 000"                    | **No currency, no "zł"** — formatted number only |
-| `rooms`    | string | "4"                          | Numeric string                         |
-| `area`     | string | "82 m²"                      | Include unit                           |
-| `floor`    | string | "3/4"                        | "piętro/łącznie"                        |
-| `year`     | string | "2024"                       | Rok budowy                             |
-| `photo`    | url    | —                            | Hero image, `bind: bg`                 |
+| Field         | Type           | Default                      | Notes                                                                        |
+|---------------|----------------|------------------------------|------------------------------------------------------------------------------|
+| `tier`        | string         | "standard"                   | `"standard"` or `"luxury"`. See Tier system § above.                         |
+| `badge`       | string         | "Nowa oferta"                | Gold chip top-left. Auto-hidden on luxury tier.                              |
+| `location`    | string         | "Białystok · Pałacowa"       | Format: "Miasto · Dzielnica"                                                  |
+| `price`       | string         | "749 000"                    | **No currency, no "zł"** — formatted number only                              |
+| `propertyName`| string         | —                            | **Luxury only** — italic property name (e.g. "Dom przy lesie") above price.   |
+| `rooms`       | number\|string | 3                            | Number → auto-pluralizes ("3 POKOJE", "5 POKOI"). String → renders verbatim.   |
+| `bathrooms`   | number\|string | 1                            | Same as rooms. 0 or missing → cell hidden.                                   |
+| `garages`     | number\|string | 1                            | Number → "1 GARAŻ", "2 GARAŻE". String → e.g. "Parking strzeżony" verbatim.   |
+| `area`        | string         | "82 m²"                      | Include unit                                                                 |
+| `agentName`   | string         | "Tomasz Brynkiewicz"         | Standard tier: appears in bottom agent strip. Luxury tier: hidden.           |
+| `agentPhone`  | string         | "+48 669 996 948"            | Standard tier: appears in bottom agent strip. Luxury tier: hidden.           |
+| `portrait`    | url            | —                            | Tomek's portrait for the agent strip. Standard tier only.                    |
+| `photo`       | url            | —                            | Hero image, `bind: bg`                                                       |
 
-**Typical call:**
+**Polish pluralization handled automatically** — pass an integer and the template picks the right form:
+- `1` → singular (`pokój`, `łazienka`, `garaż`)
+- `2–4` (not `12–14`) → paucal (`pokoje`, `łazienki`, `garaże`)
+- `5+` or `12–14` → genitive (`pokoi`, `łazienek`, `garaży`)
+
+**String override use-cases** (send a string instead of a number when it reads more naturally):
+- Property has no formal garage but has other parking: `"garages": "Parking strzeżony"` / `"garages": "Parking na ulicy"` / `"garages": "Miejsce postojowe"`
+- Rooms have a special layout: `"rooms": "Studio + alkowa"` (rarely — usually stay numeric)
+
+**Typical standard call:**
 ```json
 {
   "templateId": "T1",
   "data": {
+    "tier": "standard",
     "badge": "Nowa oferta",
-    "location": "Białystok · Centrum",
+    "location": "BIAŁYSTOK · CENTRUM",
     "price": "689 000",
-    "rooms": "3",
+    "rooms": 3,
+    "bathrooms": 1,
+    "garages": 1,
     "area": "68 m²",
-    "floor": "5/7",
-    "year": "2019",
+    "agentName": "Tomasz Brynkiewicz",
+    "agentPhone": "+48 669 996 948",
+    "portrait": "https://<tomek-portrait-url>",
     "photo": "https://<offer-photo-url>"
+  }
+}
+```
+
+**Typical luxury call** (editorial, no feat-strip, no agent strip):
+```json
+{
+  "templateId": "T1",
+  "data": {
+    "tier": "luxury",
+    "location": "SUPRAŚL · PODLASIE",
+    "propertyName": "Dom przy lesie",
+    "price": "1 600 000",
+    "rooms": 6,
+    "area": "245 m²",
+    "photo": "https://<luxury-photo-url>"
   }
 }
 ```
@@ -267,6 +311,82 @@ Full navy background, no photo. Data-heavy — numbers are the hero.
 | `www`       | string | "zboralscy-group.pl"             |                                 |
 | `portrait`  | url    | —                                | Tomek's portrait, `bind: bg`    |
 
+### 3.10 T7 — Open Day / Dzień Otwarty (1080×1350, 4:5)
+
+Event announcement post for open-house viewings. **Two tier variants — visually distinct:**
+- **Standard** → photo of the property as background with dark gradient + glass-blur date box.
+- **Luxury** → solid navy background with oversized gold sygnet decorative half-cut off the right edge. Matches the Zboralscy visual identity reference (brand book page 1 of agent templates).
+
+| Field      | Type   | Default                                 | Notes                                                          |
+|------------|--------|-----------------------------------------|----------------------------------------------------------------|
+| `tier`     | string | "standard"                              | `"standard"` (photo bg) or `"luxury"` (solid navy + sygnet)    |
+| `badge`    | string | "Wydarzenie"                            | Standard only. Hidden on luxury.                               |
+| `date`     | string | "10.03.2026"                            | Date of the open house, DD.MM.YYYY.                            |
+| `subtitle` | string | "Apartament w Centrum Białegostoku"     | Short property descriptor. Renders sans caps with gold accent. |
+| `url`      | string | "www.zboralscy-group.pl"                | Footer link.                                                   |
+| `photo`    | url    | —                                       | **Standard only.** Ignored on luxury.                          |
+
+**Typical call (standard):**
+```json
+{
+  "templateId": "T7",
+  "data": {
+    "tier": "standard",
+    "date": "10.05.2026",
+    "subtitle": "Apartament w Centrum Białegostoku",
+    "photo": "https://<property-photo-url>"
+  }
+}
+```
+
+**Typical call (luxury, for premium listings):**
+```json
+{
+  "templateId": "T7",
+  "data": {
+    "tier": "luxury",
+    "date": "10.05.2026",
+    "subtitle": "Luksusowy apartament przy Parku Branickich"
+  }
+}
+```
+
+### 3.11 T8 — Carousel Interior Slide (1080×1350, 4:5)
+
+Photo-heavy room tour slide — the body slides between T1 (cover) and T4C (closer) in a carousel. Use when Tomek wants to show multiple rooms of a listing.
+
+**Pairing pattern:** T1 cover → T8 × N room slides → T4C closer. Slide counter (e.g. "2 / 5") is displayed top-right so viewers know where they are.
+
+| Field       | Type   | Default                    | Notes                                                            |
+|-------------|--------|----------------------------|------------------------------------------------------------------|
+| `tier`      | string | "standard"                 | Same tier picker. Luxury → italic display name + floating text. |
+| `roomLabel` | string | "Sypialnia"                | Small chip top-left. Hidden on luxury.                           |
+| `slide`     | string | "2"                        | Current slide number (this one).                                 |
+| `total`     | string | "5"                        | Total carousel slides (for the counter).                         |
+| `roomName`  | string | "Sypialnia główna"         | Display room name — italic serif on luxury, upright on standard. |
+| `roomSpec`  | string | "18 m² · Okno południowe"  | Short spec line. Sans caps for readability.                      |
+| `notes`     | string | "Pełne wyposażenie, balkon"| Short descriptive sentence.                                      |
+| `photo`     | url    | —                          | Hero image of the room, `bind: bg`                               |
+
+**Rule:** Keep `tier` consistent across all slides of a single carousel. Don't mix standard T1 cover with luxury T8 slides.
+
+**Typical call (standard, carousel slide 2 of 5):**
+```json
+{
+  "templateId": "T8",
+  "data": {
+    "tier": "standard",
+    "roomLabel": "Sypialnia",
+    "slide": "2",
+    "total": "5",
+    "roomName": "Sypialnia główna",
+    "roomSpec": "18 m² · Okno południowe",
+    "notes": "Pełne wyposażenie, duży balkon",
+    "photo": "https://<sypialnia-photo-url>"
+  }
+}
+```
+
 ---
 
 ## 4. The Bellink-proxy rule (critical)
@@ -298,7 +418,7 @@ Old bug, fixed by adding `meta_create_page_photo`. Rule: always use `meta_create
 Cold-start. `min_machines_running = 1` is set (~$3/mo) to keep one Fly machine warm, but if traffic lulls the machine might still sleep. First render after idle is slow; follow-ups are ~2s. Don't retry — wait.
 
 ### 5.4 Diacritics break in data fields
-Templates handle Polish diacritics (ą, ę, ś, ł, ż, ć, ó, ź, ń) in EB Garamond + Lato. If a field renders as mojibake, the input was probably double-encoded (UTF-8 → Latin-1 → UTF-8 round-trip). Re-send as plain UTF-8.
+Templates render in **Cormorant Garamond** (serif, for display headlines + luxury tier) + **Inter** (sans, for labels + standard tier body). Both cover Polish diacritics (ą, ę, ś, ł, ż, ć, ó, ź, ń) natively. If a field renders as mojibake, the input was probably double-encoded (UTF-8 → Latin-1 → UTF-8 round-trip). Re-send as plain UTF-8. Font substitution note: these are close-enough stand-ins for the brand's primary fonts Alliance No.1 + HV Clio (both paid); substitution is brand-book-sanctioned on page 13.
 
 ### 5.5 Image URL unreachable / expired
 `render.html` waits up to 8s per image (`bind: bg` fields). If the source URL 404s, the render continues with a broken image placeholder. Always test photo URLs with a HEAD request if unsure. For listings, prefer hotlinking from Otodom/EstiCRM directly over self-hosted uploads (stable CDNs).
