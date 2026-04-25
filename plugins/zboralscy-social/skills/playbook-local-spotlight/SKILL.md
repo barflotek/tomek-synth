@@ -1,3 +1,8 @@
+---
+name: playbook-local-spotlight
+description: Recipe for a 9:16 reel — neighborhood spotlight, drone listing, or luxury property tour. Uses zboralscy_compose_reel to chain T3C intro + Tomek-supplied video + T6 outro into one MP4. Triggers on "reel", "drone", "spacer", "wirtualny spacer", "luxury".
+---
+
 # Playbook · Local / Luxury Spotlight (Reel)
 
 Create a 9:16 reel spotlight for a neighborhood or luxury listing. Uses **`zboralscy_compose_reel`** — server-side ffmpeg composes T3C intro + Tomek's source video + T6 outro into one MP4. Output goes straight to Meta publishing.

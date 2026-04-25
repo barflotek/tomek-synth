@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "bellink",
+  "description": "Bellink — vertical-specific Claude plugins for small businesses. First wave: Polish real estate (Zboralscy Białystok).",
+  "owner": {
+    "name": "Bellink",
+    "email": "bartek@fencingprocorp.com"
+  },
+  "plugins": [
+    {
+      "name": "zboralscy-social",
+      "description": "Social-media operator for Zboralscy Białystok (Polish real estate). Brand-consistent listings, sprzedane announcements, market updates, and reels for Instagram + Facebook. Tier-aware (standard / luxury), Polish-grammar correct, Meta-publish ready.",
+      "author": {
+        "name": "Bellink",
+        "email": "bartek@fencingprocorp.com"
+      },
+      "source": "./plugins/zboralscy-social",
+      "category": "marketing",
+      "homepage": "https://github.com/barflotek/tomek-synth/tree/main/plugins/zboralscy-social"
+    }
+  ]
+}

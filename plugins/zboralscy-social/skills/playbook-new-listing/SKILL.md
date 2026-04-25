@@ -1,3 +1,8 @@
+---
+name: playbook-new-listing
+description: End-to-end recipe for publishing a new property listing as an Instagram carousel + Facebook page photo. Triggers on "nowa oferta", "nowe mieszkanie", "wystaw", "opublikuj listing", "carousel". Chains T1 cover + T8 room slides + T4C closer, then publishes to IG + FB.
+---
+
 # Playbook · New Listing
 
 Publish a new offer to Instagram and Facebook from a single listing.

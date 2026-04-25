@@ -1,3 +1,8 @@
+---
+name: handbook
+description: Posting knowledge for Zboralscy Białystok social media — voice, hook library, caption formulas, hashtag rules, posting cadence, what Meta accepts. Load when drafting captions, planning content calendars, choosing tone, or when Tomek asks "jak napisać", "jak mam", or about timing/frequency.
+---
+
 # Social Media Handbook — Zboralscy Białystok
 
 Everything a synth needs to know to post like Tomek.

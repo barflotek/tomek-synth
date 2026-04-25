@@ -1,47 +1,81 @@
-# tomek-synth
+# tomek-synth · Bellink plugin marketplace
 
-Synth bundle for **Tomek / Zboralscy Białystok** — first customer deployment of the synth primitive.
+Claude plugin marketplace published by **Bellink**. First customer wave: Polish real estate (Zboralscy Białystok). Future plugins for additional verticals (legal, beauty, fitness, finance) will live as siblings under `plugins/`.
 
-A **synth** is a packaged agent persona: a small, focused skill bundle that turns a generic chat client (today: claude.ai Pro; tomorrow: Slack, Teams, custom) into a domain operator. Built on the three-layer architecture from `~/ops-vault/businesses/tomek/decisions.md` (2026-04-19): **context + apps + playbooks**.
+This repo IS a marketplace — anyone can add it to their Claude with one command:
 
-This repo is the source of truth. The synth is activated by loading these files into Tomek's claude.ai Project as Skills.
+```bash
+/plugin marketplace add barflotek/tomek-synth
+```
 
-## What's in here today
+## Plugins in this marketplace
+
+| Plugin | Purpose | Status |
+|---|---|---|
+| [`zboralscy-social`](plugins/zboralscy-social) | Social-media operator for Zboralscy Białystok — listings, sprzedane, reels, Open Day | ✅ Live |
+
+## What's a "synth"
+
+A **synth** = a packaged Claude plugin tailored to one customer's deployment. It bundles:
+
+- **Skills** (markdown files in `plugins/<name>/skills/<skill>/SKILL.md`) — instructions Claude loads on demand
+- **MCP server config** (`plugins/<name>/.mcp.json`) — points to Bellink's hosted tools at `app.bellink.io`
+- **Plugin manifest** (`plugins/<name>/.claude-plugin/plugin.json`) — metadata + version
+
+The capabilities (render images, publish to Meta, fetch from EstiCRM, etc.) live behind Bellink's MCP server. The plugin is the thin client wrapper that teaches Claude how + when to call them.
+
+## Architecture
+
+```
+Customer's claude.ai (Tomek)
+         │
+         │ /plugin install zboralscy-social@bellink
+         ▼
+[Plugin installed locally — markdown skills + .mcp.json]
+         │
+         │ Tools called when skills fire
+         ▼
+Bellink (app.bellink.io · MCP server)
+         ├─ zboralscy_render_post → Fly render service
+         ├─ meta_create_instagram_post → Meta Graph API
+         ├─ esticrm_register_inquiry → EstiCRM
+         └─ ... ~130 tools across Drive / Gmail / Meta / EstiCRM / Zboralscy
+```
+
+The plugin is open and copyable. The capabilities are auth-gated at Bellink. **Stop paying → MCP key revoked → plugin tools fail.** Standard SaaS pattern.
+
+## Repo layout
 
 ```
 tomek-synth/
-├── README.md                    ← you are here
-├── synths/
-│   └── social-media/            ← first synth: Tomek's social-media operator
-│       ├── SKILL.md             ← entry point (loaded first)
-│       ├── handbook.md          ← posting knowledge, voice, hooks
-│       ├── fly-templates.md     ← how to use the zboralscy render service + MCP tools
-│       └── playbooks/
-│           ├── new-listing.md
-│           ├── sale-closed.md
-│           └── local-spotlight.md
+├── README.md
+├── .claude-plugin/
+│   └── marketplace.json          ← marketplace registry
+└── plugins/
+    └── zboralscy-social/          ← first plugin
+        ├── .claude-plugin/
+        │   └── plugin.json        ← manifest
+        ├── .mcp.json              ← MCP server pointer
+        ├── README.md
+        └── skills/
+            ├── social-media/      ← identity + operating rules
+            ├── handbook/          ← voice, hooks, cadence
+            ├── fly-templates/     ← render tool reference
+            ├── playbook-new-listing/
+            ├── playbook-sale-closed/
+            └── playbook-local-spotlight/
 ```
 
-## Who this is for
+## Build status
 
-- **Bartek** — maintainer, source of truth, versions the synth as Tomek's workflow evolves
-- **Tomek (Tomasz Brynkiewicz)** — end user, interacts via chat, never edits these files
-- **Future synths** — this repo is the template for `synth #2`, `synth #3` etc. when we scale to other agencies
+- Format: Claude Plugin spec (Anthropic, January 2026) — see [knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins) reference
+- License: All rights reserved (private use by Bellink customers)
+- Multi-platform: Claude today; ChatGPT and Manus adapters when those product lines stabilize their plugin formats
 
-## What this is NOT
+## Roadmap (next plugins)
 
-- Not runtime code. No Node/Python/build step. Just markdown that gets uploaded to claude.ai Skills.
-- Not a framework. We evaluated Fabric (see `~/ops-vault/CAPTURE.md` 2026-04-23) — wrong primitive. We'll revisit if we decouple from claude.ai.
-- Not tool code. The MCP tools (`zboralscy_*`, `meta_*`, `esticrm_*`) live in `~/mcp-multitenant-hub` (Bellink). This repo teaches the synth how to use them.
+- `zboralscy-leads` — lead capture from Gmail/Otodom inbox + EstiCRM registration + Polish auto-reply (Synth #2, target May 2026)
+- `zboralscy-viewings` — viewing scheduling, confirmations, post-viewing feedback (Synth #3)
+- `zboralscy-reports` — weekly performance digest from EstiCRM (Synth #4)
 
-## Activation / onboarding
-
-**TBD** — Bartek + Ben are designing the activation flow after the handbook is written. Until then this repo is read-only reference material.
-
-## Related
-
-- **Bellink MCP** (tools): `~/mcp-multitenant-hub`
-- **Render service** (Fly): `~/zboralscy-templates` · https://zboralscy-templates.fly.dev
-- **Decisions log**: `~/ops-vault/businesses/tomek/decisions.md`
-- **Backlog**: `~/ops-vault/businesses/tomek/backlog.md`
-- **Strategic vision**: `~/ops-vault/SYSTEM.md`
+Each future plugin = new folder under `plugins/`, registered in `marketplace.json`. No Bellink backend changes per plugin (tools already exist or get added once, plugins reuse).

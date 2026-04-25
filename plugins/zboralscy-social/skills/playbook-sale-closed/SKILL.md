@@ -1,3 +1,8 @@
+---
+name: playbook-sale-closed
+description: Recipe for announcing a closed deal — "sprzedane" social proof post. Renders T2 (Sprzedane) and publishes to IG + FB. Triggers on "sprzedane", "closed", "zamknięte", "sukces", or when Tomek shares a sold listing.
+---
+
 # Playbook · Sale Closed (Sprzedane)
 
 Announce a closed deal on Instagram and Facebook — proof-of-work content.

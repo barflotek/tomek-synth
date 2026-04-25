@@ -1,3 +1,8 @@
+---
+name: fly-templates
+description: Authoritative reference for the Zboralscy render service and zboralscy_* MCP tools — every template (T1, T2, T3A, T3B, T3C, T4, T4C, T5, T6, T7 Open Day, T8 Carousel Interior), their fields, the standard/luxury tier system, the Bellink-proxy rule, Meta gotchas (9004 host reputation, page_photo vs page_post). Load BEFORE any render call to know the right fields.
+---
+
 # Fly Templates — Tool Mastery Guide
 
 Everything about the Zboralscy render service (`zboralscy-templates.fly.dev`) and the `zboralscy_*` MCP tools. Read this once; from then on, the synth should be able to render any template without guessing fields.
