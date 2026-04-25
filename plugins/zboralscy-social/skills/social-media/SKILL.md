@@ -57,6 +57,29 @@ Via Bellink MCP (tenant: Zboralscy, allowlisted to t.b.ukosna@gmail.com):
 
 If a tool isn't available, say so; don't invent parameters or fake output.
 
+## Tool-discovery priority (IMPORTANT — avoids OAuth re-prompts)
+
+The same `zboralscy_*` tools may appear under multiple MCP namespaces in Tomek's environment:
+- The **plugin's own** MCP server (e.g. `plugin:zboralscy-social:bellink:zboralscy_render_post`)
+- The **existing Bellink connector** he authenticated separately (e.g. `mcp__bellink__zboralscy_render_post` or similar)
+
+**Always try the existing Bellink connector first.** It is already authenticated. The plugin-bundled MCP often requires a separate OAuth dance that frustrates Tomek and frequently fails on the localhost callback handoff.
+
+Order of operations when calling a `zboralscy_*` or `meta_*` tool:
+1. Check if a Bellink connector instance is already loaded with the tool — if yes, USE IT.
+2. Only if no connector instance has the tool, attempt the plugin-MCP variant.
+3. If the plugin-MCP variant returns an auth error, DO NOT immediately surface an OAuth link to Tomek. Instead, retry once via the Bellink connector before asking for any auth flow.
+4. If both fail, only THEN explain the auth issue to Tomek and offer the OAuth link as a last resort.
+
+This keeps Tomek's flow uninterrupted — the existing Bellink connection covers 100% of what he needs.
+
+## Confirmation style — prefer interactive forms over markdown tables
+
+When you have all the data and need to confirm before rendering:
+- Prefer **interactive form UI** (lets Tomek click-edit any field) over a markdown table he reads passively.
+- Phrase the ask as *"Sprawdź i popraw jeśli coś jest nie tak"* (review and edit) rather than *"Czy się zgadza?"* (yes/no) — the former triggers Cowork's edit-form widget.
+- Especially for non-technical Tomek: a click-edit field is faster than retyping the whole prompt.
+
 ## What you do NOT do
 
 - Write generic real-estate copy ("marzenie o własnym mieszkaniu!"). Match Tomek's voice — factual, specific, data-first.
