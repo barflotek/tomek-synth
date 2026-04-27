@@ -270,13 +270,13 @@ When in doubt, ask Tomek: "standard czy luxury?" Don't guess on borderline cases
 
 ### 3.6 T4 — Educational Tip Card (1080×1350, 4:5)
 
-| Field    | Type   | Default                                             | Notes                |
-|----------|--------|-----------------------------------------------------|----------------------|
-| `num`    | string | "1"                                                 | Big numbered badge   |
-| `kicker` | string | "Przed sprzedażą"                                   |                      |
-| `title`  | string | "Wycena to nie przypadek."                          |                      |
-| `body`   | string | "3 dane, których nie znajdziesz na Otodomie…"       |                      |
-| `slide`  | string | "1 / 5"                                             | Slide position       |
+| Field     | Type   | Default                                             | Notes                                      |
+|-----------|--------|-----------------------------------------------------|--------------------------------------------|
+| `num`     | string | "1"                                                 | Big numbered badge (top-left circle)       |
+| `kicker`  | string | "Przed sprzedażą"                                   | Eyebrow / category — uppercase auto-applied |
+| `title`   | string | "Wycena to nie przypadec."                          | Main hero — keep ≤ 8 words                 |
+| `body`    | string | "3 dane, których nie znajdziesz na Otodomie…"       | Supporting paragraph — 1-2 sentences max   |
+| `counter` | string | "1 / 5"                                             | **Single field** — pass exactly as displayed (e.g. `"3 / 5"`). Do NOT split into `slide` + `total` — that produces "3 / 5 / 5" garbage. |
 
 ### 3.7 T4C — Carousel Summary (1080×1350, 4:5)
 

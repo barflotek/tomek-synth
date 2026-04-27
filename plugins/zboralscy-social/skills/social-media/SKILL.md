@@ -57,21 +57,29 @@ Via Bellink MCP (tenant: Zboralscy, allowlisted to t.b.ukosna@gmail.com):
 
 If a tool isn't available, say so; don't invent parameters or fake output.
 
-## Tool-discovery priority (IMPORTANT — avoids OAuth re-prompts)
+## Tool source — Bellink connector at account level
 
-The same `zboralscy_*` tools may appear under multiple MCP namespaces in Tomek's environment:
-- The **plugin's own** MCP server (e.g. `plugin:zboralscy-social:bellink:zboralscy_render_post`)
-- The **existing Bellink connector** he authenticated separately (e.g. `mcp__bellink__zboralscy_render_post` or similar)
+This plugin **does not bundle its own MCP server**. All `zboralscy_*` and `meta_*` tools come from the **Bellink connector** that Tomek connected at his claude.ai account level (Settings → Connect Apps → Bellink).
 
-**Always try the existing Bellink connector first.** It is already authenticated. The plugin-bundled MCP often requires a separate OAuth dance that frustrates Tomek and frequently fails on the localhost callback handoff.
+If the Bellink connector tools are not visible in your tool list, **DO NOT** offer an OAuth link or any "authorize" step. The plugin can't fix account-level connections. Instead respond:
 
-Order of operations when calling a `zboralscy_*` or `meta_*` tool:
-1. Check if a Bellink connector instance is already loaded with the tool — if yes, USE IT.
-2. Only if no connector instance has the tool, attempt the plugin-MCP variant.
-3. If the plugin-MCP variant returns an auth error, DO NOT immediately surface an OAuth link to Tomek. Instead, retry once via the Bellink connector before asking for any auth flow.
-4. If both fail, only THEN explain the auth issue to Tomek and offer the OAuth link as a last resort.
+> *"Nie widzę połączenia z Bellink. Sprawdź czy w ustawieniach konta (Settings → Connect Apps) Bellink jest podłączony."*
 
-This keeps Tomek's flow uninterrupted — the existing Bellink connection covers 100% of what he needs.
+Then stop and wait. **Never** redirect Tomek to a localhost OAuth flow — that path is gone in v1.0.4+.
+
+## Meta tool parameter naming (camelCase, NOT snake_case)
+
+Bellink's Meta tools use camelCase, **not** the snake_case in Meta Graph API docs:
+
+| ✅ Correct (Bellink) | ❌ Wrong (Meta docs)        |
+|----------------------|------------------------------|
+| `instagramAccountId` | `instagram_account_id`       |
+| `imageUrl`           | `image_url`                  |
+| `pageId`             | `page_id`                    |
+| `mediaUrl`           | `media_url`                  |
+| `caption`            | `caption` (same)             |
+
+If a tool call returns a validator error mentioning a parameter name, switch to camelCase before retrying.
 
 ## Confirmation style — prefer interactive forms over markdown tables
 

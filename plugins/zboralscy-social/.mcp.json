@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "bellink": {
-      "type": "http",
-      "url": "https://app.bellink.io/api/mcp/server"
-    }
-  }
-}
