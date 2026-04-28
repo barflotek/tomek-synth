@@ -101,23 +101,49 @@ Umów oglądanie →
 
 ### 4. Publish to Instagram
 
+**Single image** (one slide only):
 ```
 meta_create_instagram_post({
-  image_url: <url z kroku 2>,
-  caption:   <finalny tekst z kroku 3>
+  instagramAccountId: <id>,
+  imageUrl:           <url z kroku 2>,
+  caption:            <finalny tekst z kroku 3>
 })
 ```
+
+**Carousel** (2–10 slides — typical for new listing: T1 cover + T8 room slides + T4C closer):
+```
+meta_create_instagram_carousel({
+  instagramAccountId: <id>,
+  imageUrls:          [<url-cover>, <url-slide-2>, ..., <url-closer>],
+  caption:            <finalny tekst z kroku 3>
+})
+```
+
+**Always use the carousel tool when posting more than one image** — it produces ONE swipeable post on IG. Calling `meta_create_instagram_post` 6× produces 6 separate posts, NOT a carousel. Confirmed in 2026-04-27 test session.
 
 Check response. If 9004 or other error: read `error_subcode`, `fbtrace_id`, `error_user_msg` — report verbatim to Tomek, do NOT retry.
 
 ### 5. Publish to Facebook Page
 
+**Single image:**
 ```
 meta_create_page_photo({
-  image_url: <same url>,
-  message:   <same caption, lekko dostosowany — FB pozwala na dłuższy opis>
+  pageId:   <id>,
+  imageUrl: <same url>,
+  caption:  <same caption, lekko dostosowany — FB pozwala na dłuższy opis>
 })
 ```
+
+**Carousel** (2–10 photos as ONE swipeable feed post):
+```
+meta_create_facebook_carousel({
+  pageId:    <id>,
+  imageUrls: [<url-cover>, <url-slide-2>, ..., <url-closer>],
+  message:   <same caption>
+})
+```
+
+**Same rule as IG:** if you have more than one image, use the carousel tool. Calling `meta_create_page_photo` N times produces N separate album/photo posts on the page, NOT a carousel.
 
 **Do NOT use `meta_create_page_post`** — it silently drops image params (lying API). If in doubt, re-read [`../fly-templates.md` § 5.2](../fly-templates.md).
 

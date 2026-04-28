@@ -1,6 +1,6 @@
 {
   "name": "zboralscy-social",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Social-media operator for Zboralscy Białystok (Polish real estate). Drafts, renders, and publishes brand-consistent listings, sales announcements, market updates, and reels to Instagram and Facebook. Uses the zboralscy_* render pipeline + meta_* publishing tools, served by Bellink (app.bellink.io).",
   "author": {
     "name": "Bellink",
